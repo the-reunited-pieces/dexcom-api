@@ -11,6 +11,14 @@ export const appRouter = router({
         console.log(`[API] Handling /dataRange`);
         return await api.dataRange();
     }),
+    events: proc.input(z.object({ start: z.number(), end: z.number() })).query(async ({ input: { start, end } }) => {
+        console.log(`[API] handling /events start=${start} end=${end}`);
+        return await api.events(new Date(start), new Date(end));
+    }),
+    alerts: proc.input(z.object({ start: z.number(), end: z.number() })).query(async ({ input: { start, end } }) => {
+        console.log(`[API] handling /alerts start=${start} end=${end}`);
+        return await api.alerts(new Date(start), new Date(end));
+    }),
 });
 
 export type AppRouter = typeof appRouter;

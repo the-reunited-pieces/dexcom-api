@@ -1,62 +1,35 @@
 import z from "zod";
-import { getSecrets, writeSecrets } from "./secrets.js";
-import { Mutex } from "async-mutex";
-const mutex = new Mutex();
+import { getSecrets } from "./secrets.js";
 async function makeRequest(path, validator) {
-    return await mutex.runExclusive(async () => {
-        const secrets = await getSecrets();
-        if (!secrets)
-            return { error: "auth", value: null };
-        if (secrets.expires_at <= Date.now())
-            return { error: "auth", value: null };
-        let access_token = secrets.access_token;
-        if (secrets.expires_at <= Date.now() + 10 * 60 * 60 * 1000) {
-            const res = await fetch(`${process.env.DEXCOM_API}/v3/oauth2/token`, {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    client_id: process.env.DEXCOM_CLIENT_ID,
-                    client_secret: process.env.DEXCOM_CLIENT_SECRET,
-                    grant_type: "refresh_token",
-                    refresh_token: secrets.refresh_token,
-                }),
-            });
-            if (!res.ok)
-                return { error: "auth", value: null };
-            const data = await res
-                .json()
-                .then(async (data) => await tokenResponseValidator.parseAsync(data))
-                .catch(() => null);
-            if (data == null)
-                return { error: "auth", value: null };
-            access_token = data.access_token;
-            const success = await writeSecrets({
-                access_token: data.access_token,
-                refresh_token: data.refresh_token,
-                expires_at: Date.now() + data.expires_in * 1000,
-            });
-            if (!success)
-                return { error: "write", value: null };
+    console.log(`[API] Making outgoing request to \`${path}\``);
+    const secrets = await getSecrets();
+    if (!secrets || secrets.expires_at <= Date.now())
+        return { error: "auth", value: null };
+    const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${secrets.access_token}` } });
+    if (res.status === 401 || res.status === 403)
+        return { error: "auth", value: null };
+    if (!res.ok)
+        return { error: "dexcom", value: null };
+    const data = await res
+        .json()
+        .then(async (raw) => {
+        const { success, data, error } = await validator.safeParseAsync(raw);
+        if (!success) {
+            console.error(`[API] DEXCOM response failed validation:\n${error.issues.map((issue) => `- [${issue.path}] ${issue.message}`).join("\n")}\nJSON: ${JSON.stringify(raw, null, 4)}`);
+            return null;
         }
-        const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${access_token}` } });
-        if (res.status === 401 || res.status === 403)
-            return { error: "auth", value: null };
-        if (!res.ok)
-            return { error: "dexcom", value: null };
-        const data = await res
-            .json()
-            .then(async (data) => await validator.parseAsync(data))
-            .catch(() => null);
-        if (data === null)
-            return { error: "parse", value: null };
-        return { error: null, value: data };
-    });
+        return data;
+    })
+        .catch(() => null);
+    if (data === null)
+        return { error: "parse", value: null };
+    return { error: null, value: data };
 }
 export const api = {
     egvs: async (start, end) => await makeRequest(`/egvs?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`, egvsValidator),
     dataRange: async () => await makeRequest("/dataRange", dataRangeValidator),
+    events: async (start, end) => await makeRequest(`/events?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`, eventsValidator),
+    alerts: async (start, end) => await makeRequest(`/alerts?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`, alertsValidator),
 };
 export const tokenResponseValidator = z.object({
     access_token: z.string(),
@@ -109,6 +82,46 @@ const egvsValidator = z.object({
         rateInMgdlmin: obj.trendRate,
         rateInMmollmin: obj.trendRate === undefined ? undefined : obj.trendRate / 18,
     }))
+        .array(),
+});
+const eventsValidator = z.object({
+    recordType: z.literal("event"),
+    recordVersion: z.string(),
+    userId: z.string(),
+    records: z
+        .object({
+        recordId: z.string(),
+        systemTime: z.string(),
+        displayTime: z.string(),
+        eventStatus: z.string(),
+        eventType: z.string(),
+        eventSubType: z.string(),
+        value: z.string(),
+        unit: z.string(),
+        transmitterId: z.string(),
+        transmitterGeneration: z.string(),
+        transmitterGenerationVariant: z.string(),
+        displayDevice: z.string(),
+    })
+        .array(),
+});
+const alertsValidator = z.object({
+    recordType: z.literal("alert"),
+    recordVersion: z.string(),
+    userId: z.string(),
+    records: z
+        .object({
+        recordId: z.string(),
+        systemTime: z.string(),
+        displayTime: z.string(),
+        alertName: z.string(),
+        alertState: z.string(),
+        displayDevice: z.string(),
+        transmitterGeneration: z.string(),
+        transmitterGenerationVariant: z.string(),
+        transmitterId: z.string(),
+        displayApp: z.string(),
+    })
         .array(),
 });
 //# sourceMappingURL=dexcom.js.map

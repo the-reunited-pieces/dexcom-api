@@ -90,6 +90,70 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
     }>;
+    events: import("@trpc/server").TRPCQueryProcedure<{
+        input: {
+            start: number;
+            end: number;
+        };
+        output: {
+            error: string;
+            value: null;
+        } | {
+            error: null;
+            value: {
+                recordType: "event";
+                recordVersion: string;
+                userId: string;
+                records: {
+                    recordId: string;
+                    systemTime: string;
+                    displayTime: string;
+                    eventStatus: string;
+                    eventType: string;
+                    eventSubType: string;
+                    value: string;
+                    unit: string;
+                    transmitterId: string;
+                    transmitterGeneration: string;
+                    transmitterGenerationVariant: string;
+                    displayDevice: string;
+                }[];
+            };
+        };
+        meta: object;
+        errorShape: import("@trpc/server").TRPCDefaultErrorShape;
+    }>;
+    alerts: import("@trpc/server").TRPCQueryProcedure<{
+        input: {
+            start: number;
+            end: number;
+        };
+        output: {
+            error: string;
+            value: null;
+        } | {
+            error: null;
+            value: {
+                recordType: "alert";
+                recordVersion: string;
+                userId: string;
+                records: {
+                    recordId: string;
+                    systemTime: string;
+                    displayTime: string;
+                    alertName: string;
+                    alertState: string;
+                    displayDevice: string;
+                    transmitterGeneration: string;
+                    transmitterGenerationVariant: string;
+                    transmitterId: string;
+                    displayApp: string;
+                }[];
+            };
+        };
+        meta: object;
+        errorShape: import("@trpc/server").TRPCDefaultErrorShape;
+    }>;
 }>>;
 export type AppRouter = typeof appRouter;
 //# sourceMappingURL=appRouter.d.ts.map

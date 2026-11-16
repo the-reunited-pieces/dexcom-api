@@ -1,8 +1,9 @@
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import { appRouter } from "./appRouter.js";
 import "dotenv/config.js";
-const server = createHTTPServer({
-    router: appRouter,
-});
+import { appRouter } from "./appRouter.js";
+import { keepalive } from "./keepalive.js";
+const server = createHTTPServer({ router: appRouter });
 server.listen(process.env.PORT);
+console.log(`[API] Listening on :${process.env.PORT}`);
+keepalive();
 //# sourceMappingURL=index.js.map

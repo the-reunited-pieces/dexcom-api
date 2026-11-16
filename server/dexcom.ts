@@ -13,7 +13,16 @@ async function makeRequest<T extends z.ZodObject>(path: string, validator: T): P
 
     const data = await res
         .json()
-        .then(async (data) => await validator.parseAsync(data))
+        .then(async (raw) => {
+            const { success, data, error } = await validator.safeParseAsync(raw);
+            if (!success) {
+                console.error(
+                    `[API] DEXCOM response failed validation:\n${error.issues.map((issue) => `- [${issue.path}] ${issue.message}`).join("\n")}\nJSON: ${JSON.stringify(raw, null, 4)}`,
+                );
+                return null;
+            }
+            return data;
+        })
         .catch(() => null);
 
     if (data === null) return { error: "parse", value: null };
@@ -28,6 +37,16 @@ export const api = {
             egvsValidator,
         ),
     dataRange: async () => await makeRequest("/dataRange", dataRangeValidator),
+    events: async (start: Date, end: Date) =>
+        await makeRequest(
+            `/events?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`,
+            eventsValidator,
+        ),
+    alerts: async (start: Date, end: Date) =>
+        await makeRequest(
+            `/alerts?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`,
+            alertsValidator,
+        ),
 };
 
 export const tokenResponseValidator = z.object({
@@ -85,5 +104,47 @@ const egvsValidator = z.object({
             rateInMgdlmin: obj.trendRate,
             rateInMmollmin: obj.trendRate === undefined ? undefined : obj.trendRate / 18,
         }))
+        .array(),
+});
+
+const eventsValidator = z.object({
+    recordType: z.literal("event"),
+    recordVersion: z.string(),
+    userId: z.string(),
+    records: z
+        .object({
+            recordId: z.string(),
+            systemTime: z.string(),
+            displayTime: z.string(),
+            eventStatus: z.string(),
+            eventType: z.string(),
+            eventSubType: z.string(),
+            value: z.string(),
+            unit: z.string(),
+            transmitterId: z.string(),
+            transmitterGeneration: z.string(),
+            transmitterGenerationVariant: z.string(),
+            displayDevice: z.string(),
+        })
+        .array(),
+});
+
+const alertsValidator = z.object({
+    recordType: z.literal("alert"),
+    recordVersion: z.string(),
+    userId: z.string(),
+    records: z
+        .object({
+            recordId: z.string(),
+            systemTime: z.string(),
+            displayTime: z.string(),
+            alertName: z.string(),
+            alertState: z.string(),
+            displayDevice: z.string(),
+            transmitterGeneration: z.string(),
+            transmitterGenerationVariant: z.string(),
+            transmitterId: z.string(),
+            displayApp: z.string(),
+        })
         .array(),
 });

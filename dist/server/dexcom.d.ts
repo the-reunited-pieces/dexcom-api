@@ -73,6 +73,54 @@ export declare const api: {
             } | undefined;
         };
     }>;
+    events: (start: Date, end: Date) => Promise<{
+        error: string;
+        value: null;
+    } | {
+        error: null;
+        value: {
+            recordType: "event";
+            recordVersion: string;
+            userId: string;
+            records: {
+                recordId: string;
+                systemTime: string;
+                displayTime: string;
+                eventStatus: string;
+                eventType: string;
+                eventSubType: string;
+                value: string;
+                unit: string;
+                transmitterId: string;
+                transmitterGeneration: string;
+                transmitterGenerationVariant: string;
+                displayDevice: string;
+            }[];
+        };
+    }>;
+    alerts: (start: Date, end: Date) => Promise<{
+        error: string;
+        value: null;
+    } | {
+        error: null;
+        value: {
+            recordType: "alert";
+            recordVersion: string;
+            userId: string;
+            records: {
+                recordId: string;
+                systemTime: string;
+                displayTime: string;
+                alertName: string;
+                alertState: string;
+                displayDevice: string;
+                transmitterGeneration: string;
+                transmitterGenerationVariant: string;
+                transmitterId: string;
+                displayApp: string;
+            }[];
+        };
+    }>;
 };
 export declare const tokenResponseValidator: z.ZodObject<{
     access_token: z.ZodString;
