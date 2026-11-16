@@ -88,7 +88,7 @@ export declare const api: {
                 displayTime: string;
                 eventStatus: string;
                 eventType: string;
-                eventSubType: string;
+                eventSubType?: string | undefined;
                 value: string;
                 unit: string;
                 transmitterId: string;

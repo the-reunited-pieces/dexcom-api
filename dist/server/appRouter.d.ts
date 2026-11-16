@@ -110,7 +110,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
                     displayTime: string;
                     eventStatus: string;
                     eventType: string;
-                    eventSubType: string;
+                    eventSubType?: string | undefined;
                     value: string;
                     unit: string;
                     transmitterId: string;

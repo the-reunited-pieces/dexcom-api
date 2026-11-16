@@ -95,7 +95,7 @@ const eventsValidator = z.object({
         displayTime: z.string(),
         eventStatus: z.string(),
         eventType: z.string(),
-        eventSubType: z.string(),
+        eventSubType: z.string().optional(),
         value: z.string(),
         unit: z.string(),
         transmitterId: z.string(),

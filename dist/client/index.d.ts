@@ -1,5 +1,5 @@
 import "dotenv/config.js";
-export declare const trpc: import("@trpc/client").TRPCClient<import("@trpc/server").TRPCBuiltRouter<{
+export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRPCClient<import("@trpc/server").TRPCBuiltRouter<{
     ctx: object;
     meta: object;
     errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -111,7 +111,7 @@ export declare const trpc: import("@trpc/client").TRPCClient<import("@trpc/serve
                     displayTime: string;
                     eventStatus: string;
                     eventType: string;
-                    eventSubType: string;
+                    eventSubType?: string | undefined;
                     value: string;
                     unit: string;
                     transmitterId: string;
