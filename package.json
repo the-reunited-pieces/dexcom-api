@@ -1,0 +1,33 @@
+{
+  "name": "dexcom-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-reunited-pieces/dexcom-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/the-reunited-pieces/dexcom-api/issues"
+  },
+  "homepage": "https://github.com/the-reunited-pieces/dexcom-api#readme",
+  "dependencies": {
+    "@trpc/client": "^11.28.3",
+    "@trpc/server": "^11.28.3",
+    "async-mutex": "^0.5.0",
+    "dotenv": "^18.0.10",
+    "fastify": "^5.12.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
