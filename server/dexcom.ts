@@ -1,63 +1,22 @@
 import z from "zod";
-import { getSecrets, writeSecrets } from "./secrets.ts";
-import { Mutex } from "async-mutex";
-
-const mutex = new Mutex();
+import { getSecrets } from "./secrets.ts";
 
 async function makeRequest<T extends z.ZodObject>(path: string, validator: T): Promise<{ error: string; value: null } | { error: null; value: z.infer<T> }> {
-    return await mutex.runExclusive(async () => {
-        const secrets = await getSecrets();
-        if (!secrets) return { error: "auth", value: null };
+    const secrets = await getSecrets();
+    if (!secrets || secrets.expires_at <= Date.now()) return { error: "auth", value: null };
 
-        if (secrets.expires_at <= Date.now()) return { error: "auth", value: null };
-        let access_token = secrets.access_token;
+    const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${secrets.access_token}` } });
+    if (res.status === 401 || res.status === 403) return { error: "auth", value: null };
+    if (!res.ok) return { error: "dexcom", value: null };
 
-        if (secrets.expires_at <= Date.now() + 10 * 60 * 60 * 1000) {
-            const res = await fetch(`${process.env.DEXCOM_API}/v3/oauth2/token`, {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    client_id: process.env.DEXCOM_CLIENT_ID!,
-                    client_secret: process.env.DEXCOM_CLIENT_SECRET!,
-                    grant_type: "refresh_token",
-                    refresh_token: secrets.refresh_token,
-                }),
-            });
+    const data = await res
+        .json()
+        .then(async (data) => await validator.parseAsync(data))
+        .catch(() => null);
 
-            if (!res.ok) return { error: "auth", value: null };
+    if (data === null) return { error: "parse", value: null };
 
-            const data = await res
-                .json()
-                .then(async (data) => await tokenResponseValidator.parseAsync(data))
-                .catch(() => null);
-
-            if (data == null) return { error: "auth", value: null };
-            access_token = data.access_token;
-            const success = await writeSecrets({
-                access_token: data.access_token,
-                refresh_token: data.refresh_token,
-                expires_at: Date.now() + data.expires_in * 1000,
-            });
-            if (!success) return { error: "write", value: null };
-        }
-
-        const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${access_token}` } });
-
-        if (res.status === 401 || res.status === 403) return { error: "auth", value: null };
-
-        if (!res.ok) return { error: "dexcom", value: null };
-
-        const data = await res
-            .json()
-            .then(async (data) => await validator.parseAsync(data))
-            .catch(() => null);
-
-        if (data === null) return { error: "parse", value: null };
-
-        return { error: null, value: data };
-    });
+    return { error: null, value: data };
 }
 
 export const api = {

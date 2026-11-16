@@ -1,6 +1,6 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "../server/appRouter.js";
 import "dotenv/config.js";
+import type { AppRouter } from "../server/appRouter.js";
 
 export const trpc = createTRPCClient<AppRouter>({
     links: [
