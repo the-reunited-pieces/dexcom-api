@@ -3,6 +3,8 @@ import { getSecrets, writeSecrets } from "./secrets.ts";
 import { sendAlert } from "./webhook.ts";
 
 async function refresh() {
+    console.log(`[API] Starting refresh...`);
+
     const quit = (message: string, fatal: boolean) =>
         sendAlert(`API authentication auto-refresh failed: ${message}. ${fatal ? "The server is now stopping" : "Non-fatal—will try again later"}.`, fatal)
             .catch(() => null)
@@ -14,7 +16,10 @@ async function refresh() {
     if (data.expires_at <= Date.now())
         return quit("`secrets.json` has fully expired and cannot be refreshed—please re-run `node login.ts` on the server", true);
 
-    if (data.expires_at > Date.now() + 10 * 60 * 60 * 1000) return; // No refresh needed yet
+    if (data.expires_at > Date.now() + 10 * 60 * 1000) {
+        console.log(`[API] Refresh not yet needed (expiry is not within 10 minutes).`);
+        return;
+    }
 
     const res = await fetch(`${process.env.DEXCOM_API}/v3/oauth2/token`, {
         method: "POST",
@@ -44,6 +49,7 @@ async function refresh() {
     });
 
     if (!success) return quit("the refresh succeeded, but `secrets.json` could not be updated", true);
+    console.log(`[API] Tokens have been refreshed.`);
 }
 
 export function keepalive() {

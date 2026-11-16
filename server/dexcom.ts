@@ -2,6 +2,8 @@ import z from "zod";
 import { getSecrets } from "./secrets.ts";
 
 async function makeRequest<T extends z.ZodObject>(path: string, validator: T): Promise<{ error: string; value: null } | { error: null; value: z.infer<T> }> {
+    console.log(`[API] Making outgoing request to \`${path}\``);
+
     const secrets = await getSecrets();
     if (!secrets || secrets.expires_at <= Date.now()) return { error: "auth", value: null };
 
