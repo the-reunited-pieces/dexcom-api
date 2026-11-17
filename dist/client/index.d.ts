@@ -13,6 +13,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -51,6 +52,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -101,6 +103,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -135,6 +138,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {

@@ -1,15 +1,16 @@
 import z from "zod";
 import { getSecrets } from "./secrets.js";
 async function makeRequest(path, validator) {
+    const fail = (error) => ({ error, value: null, sandbox: !!process.env.DEXCOM_SANDBOX });
     console.log(`[API] Making outgoing request to \`${path}\``);
     const secrets = await getSecrets();
     if (!secrets || secrets.expires_at <= Date.now())
-        return { error: "auth", value: null };
+        return fail("auth");
     const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${secrets.access_token}` } });
     if (res.status === 401 || res.status === 403)
-        return { error: "auth", value: null };
+        return fail("auth");
     if (!res.ok)
-        return { error: "dexcom", value: null };
+        return fail("dexcom");
     const data = await res
         .json()
         .then(async (raw) => {
@@ -22,7 +23,7 @@ async function makeRequest(path, validator) {
     })
         .catch(() => null);
     if (data === null)
-        return { error: "parse", value: null };
+        return fail("parse");
     return { error: null, value: data, sandbox: !!process.env.DEXCOM_SANDBOX };
 }
 export const api = {

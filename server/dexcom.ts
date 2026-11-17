@@ -4,15 +4,16 @@ import { getSecrets } from "./secrets.ts";
 async function makeRequest<T extends z.ZodObject>(
     path: string,
     validator: T,
-): Promise<{ error: string; value: null } | { error: null; value: z.infer<T>; sandbox: boolean }> {
+): Promise<{ error: string; value: null; sandbox: boolean } | { error: null; value: z.infer<T>; sandbox: boolean }> {
+    const fail = (error: string) => ({ error, value: null, sandbox: !!process.env.DEXCOM_SANDBOX });
     console.log(`[API] Making outgoing request to \`${path}\``);
 
     const secrets = await getSecrets();
-    if (!secrets || secrets.expires_at <= Date.now()) return { error: "auth", value: null };
+    if (!secrets || secrets.expires_at <= Date.now()) return fail("auth");
 
     const res = await fetch(`${process.env.DEXCOM_API}/v3/users/self${path}`, { headers: { Authorization: `Bearer ${secrets.access_token}` } });
-    if (res.status === 401 || res.status === 403) return { error: "auth", value: null };
-    if (!res.ok) return { error: "dexcom", value: null };
+    if (res.status === 401 || res.status === 403) return fail("auth");
+    if (!res.ok) return fail("dexcom");
 
     const data = await res
         .json()
@@ -28,7 +29,7 @@ async function makeRequest<T extends z.ZodObject>(
         })
         .catch(() => null);
 
-    if (data === null) return { error: "parse", value: null };
+    if (data === null) return fail("parse");
 
     return { error: null, value: data, sandbox: !!process.env.DEXCOM_SANDBOX };
 }

@@ -12,6 +12,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -50,6 +51,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -100,6 +102,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {
@@ -134,6 +137,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
         output: {
             error: string;
             value: null;
+            sandbox: boolean;
         } | {
             error: null;
             value: {

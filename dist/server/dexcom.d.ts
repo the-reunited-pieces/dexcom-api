@@ -3,6 +3,7 @@ export declare const api: {
     egvs: (start: Date, end: Date) => Promise<{
         error: string;
         value: null;
+        sandbox: boolean;
     } | {
         error: null;
         value: {
@@ -36,6 +37,7 @@ export declare const api: {
     dataRange: () => Promise<{
         error: string;
         value: null;
+        sandbox: boolean;
     } | {
         error: null;
         value: {
@@ -78,6 +80,7 @@ export declare const api: {
     events: (start: Date, end: Date) => Promise<{
         error: string;
         value: null;
+        sandbox: boolean;
     } | {
         error: null;
         value: {
@@ -104,6 +107,7 @@ export declare const api: {
     alerts: (start: Date, end: Date) => Promise<{
         error: string;
         value: null;
+        sandbox: boolean;
     } | {
         error: null;
         value: {
