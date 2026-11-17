@@ -1,4 +1,3 @@
-import "dotenv/config.js";
 export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRPCClient<import("@trpc/server").TRPCBuiltRouter<{
     ctx: object;
     meta: object;
