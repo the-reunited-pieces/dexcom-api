@@ -31,6 +31,7 @@ export declare const api: {
                 rateInMmollmin: number | undefined;
             }[];
         };
+        sandbox: boolean;
     }>;
     dataRange: () => Promise<{
         error: string;
@@ -72,6 +73,7 @@ export declare const api: {
                 };
             } | undefined;
         };
+        sandbox: boolean;
     }>;
     events: (start: Date, end: Date) => Promise<{
         error: string;
@@ -97,6 +99,7 @@ export declare const api: {
                 displayDevice: string;
             }[];
         };
+        sandbox: boolean;
     }>;
     alerts: (start: Date, end: Date) => Promise<{
         error: string;
@@ -120,6 +123,7 @@ export declare const api: {
                 displayApp: string;
             }[];
         };
+        sandbox: boolean;
     }>;
 };
 export declare const tokenResponseValidator: z.ZodObject<{

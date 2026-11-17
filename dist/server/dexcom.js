@@ -23,7 +23,7 @@ async function makeRequest(path, validator) {
         .catch(() => null);
     if (data === null)
         return { error: "parse", value: null };
-    return { error: null, value: data };
+    return { error: null, value: data, sandbox: !!process.env.DEXCOM_SANDBOX };
 }
 export const api = {
     egvs: async (start, end) => await makeRequest(`/egvs?${new URLSearchParams({ startDate: start.toISOString().slice(0, -1), endDate: end.toISOString().slice(0, -1) })}`, egvsValidator),

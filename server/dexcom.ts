@@ -1,7 +1,10 @@
 import z from "zod";
 import { getSecrets } from "./secrets.ts";
 
-async function makeRequest<T extends z.ZodObject>(path: string, validator: T): Promise<{ error: string; value: null } | { error: null; value: z.infer<T> }> {
+async function makeRequest<T extends z.ZodObject>(
+    path: string,
+    validator: T,
+): Promise<{ error: string; value: null } | { error: null; value: z.infer<T>; sandbox: boolean }> {
     console.log(`[API] Making outgoing request to \`${path}\``);
 
     const secrets = await getSecrets();
@@ -27,7 +30,7 @@ async function makeRequest<T extends z.ZodObject>(path: string, validator: T): P
 
     if (data === null) return { error: "parse", value: null };
 
-    return { error: null, value: data };
+    return { error: null, value: data, sandbox: !!process.env.DEXCOM_SANDBOX };
 }
 
 export const api = {

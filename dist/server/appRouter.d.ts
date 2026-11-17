@@ -40,6 +40,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
                     rateInMmollmin: number | undefined;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -86,6 +87,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
                     };
                 } | undefined;
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -119,6 +121,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
                     displayDevice: string;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -150,6 +153,7 @@ export declare const appRouter: import("@trpc/server").TRPCBuiltRouter<{
                     displayApp: string;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;

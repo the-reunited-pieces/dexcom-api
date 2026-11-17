@@ -41,6 +41,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
                     rateInMmollmin: number | undefined;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -87,6 +88,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
                     };
                 } | undefined;
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -120,6 +122,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
                     displayDevice: string;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
@@ -151,6 +154,7 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
                     displayApp: string;
                 }[];
             };
+            sandbox: boolean;
         };
         meta: object;
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
