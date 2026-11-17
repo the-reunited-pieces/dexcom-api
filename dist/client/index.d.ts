@@ -1,3 +1,4 @@
+import type { AppRouter } from "../server/appRouter.js";
 export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRPCClient<import("@trpc/server").TRPCBuiltRouter<{
     ctx: object;
     meta: object;
@@ -155,4 +156,5 @@ export declare const makeTRPCClient: (url: string) => import("@trpc/client").TRP
         errorShape: import("@trpc/server").TRPCDefaultErrorShape;
     }>;
 }>>>;
+export { type AppRouter };
 //# sourceMappingURL=index.d.ts.map
